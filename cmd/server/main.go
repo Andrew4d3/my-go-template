@@ -34,7 +34,7 @@ func connectToDB(mainLogger logger.Logger) {
 	mainLogger.Info("Connecting to Mongo DB")
 	appConfigs := configs.GetAppConfig()
 
-	if err := mongodb.ConnectDB(appConfigs.MONGO_URI, appConfigs.MONGO_DATABASE); err != nil {
+	if err := mongodb.ConnectDB(appConfigs.MongoURI, appConfigs.MongoDatabase); err != nil {
 		mainLogger.Error(customerror.NewFromErrror(err))
 		// Panic here if you are required to have a DB connection for running your app
 		return
@@ -42,7 +42,6 @@ func connectToDB(mainLogger logger.Logger) {
 	mainLogger.Info("Mongo connection established")
 }
 
-// TODO delete test logs
 func main() {
 	godotenv.Load()
 
@@ -58,7 +57,7 @@ func main() {
 	middlewares.SetMiddlewares(echoServer)
 	routes.SetRoutes(echoServer)
 
-	port := configs.GetAppConfig().PORT
+	port := configs.GetAppConfig().Port
 	mainLogger.Info("Starting server in port: " + port)
 	if err := echoServer.Start(":" + port); err != nil {
 		mainLogger.Error(customerror.NewFromErrror(err))

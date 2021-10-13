@@ -10,6 +10,7 @@ type customContext struct {
 	echo.Context
 }
 
+// CustomContext is an interface responsible for getting Custom context data
 type CustomContext interface {
 	CustomLogger() logger.Logger
 	TraceData() logger.TraceData

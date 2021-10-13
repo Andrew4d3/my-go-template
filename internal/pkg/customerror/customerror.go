@@ -4,6 +4,7 @@ import (
 	"github.com/go-errors/errors"
 )
 
+// CustomError provides a custom error interface
 type CustomError interface {
 	Error() string
 	GetData() map[string]interface{}
@@ -18,7 +19,8 @@ type customError struct {
 	Data       map[string]interface{}
 }
 
-type CustomErrorData struct {
+// InputData defines custom error input data
+type InputData struct {
 	StatusCode int
 	ErrType    string
 	Data       map[string]interface{}
@@ -49,27 +51,30 @@ func (c *customError) setFunction() {
 	c.Function = c.err.StackFrames()[1].String()
 }
 
-func (err *customError) setErrorData(errData []CustomErrorData) {
+func (c *customError) setErrorData(errData []InputData) {
 	if len(errData) > 0 {
-		err.Data = errData[0].Data
-		err.ErrType = errData[0].ErrType
-		err.StatusCode = errData[0].StatusCode
+		c.Data = errData[0].Data
+		c.ErrType = errData[0].ErrType
+		c.StatusCode = errData[0].StatusCode
 	}
 }
 
-func createCustomError(err *errors.Error) CustomError {
+func createCustomError(err *errors.Error, errData []InputData) CustomError {
 	customError := customError{err: err}
 	customError.setFunction()
+	customError.setErrorData(errData)
 
 	return customError
 }
 
-func New(msg string, errData ...CustomErrorData) CustomError {
+// New creates a new custom error instance
+func New(msg string, errData ...InputData) CustomError {
 	e := errors.Errorf(msg)
-	return createCustomError(e)
+	return createCustomError(e, errData)
 }
 
-func NewFromErrror(err error, errData ...CustomErrorData) CustomError {
+// NewFromErrror creates a new custom error instance based on an error
+func NewFromErrror(err error, errData ...InputData) CustomError {
 	e := errors.New(err)
-	return createCustomError(e)
+	return createCustomError(e, errData)
 }

@@ -12,9 +12,9 @@ func traceMiddeware(next echo.HandlerFunc) echo.HandlerFunc {
 		cc, _ := c.(*customContext)
 
 		traceData := logger.TraceData{
-			TransactionId: headers.Get("x-transaction-id"),
-			SessionId:     headers.Get("x-session-id"),
-			ChannelId:     headers.Get("x-channel-id"),
+			TransactionID: headers.Get("x-transaction-id"),
+			SessionID:     headers.Get("x-session-id"),
+			ChannelID:     headers.Get("x-channel-id"),
 			ConsumerName:  headers.Get("x-consumer"),
 		}
 

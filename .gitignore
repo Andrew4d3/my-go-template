@@ -36,3 +36,6 @@ data/cassandra/*
 
 #vscode
 .vscode/
+
+#binary
+server

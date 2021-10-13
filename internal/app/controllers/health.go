@@ -12,6 +12,6 @@ var getAppConfig = configs.GetAppConfig
 func HealthCheck(c echo.Context) error {
 	return c.JSON(200, map[string]string{
 		"message":     "API is healthy",
-		"environment": getAppConfig().ENVIRONMENT,
+		"environment": getAppConfig().Environment,
 	})
 }

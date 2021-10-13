@@ -15,30 +15,32 @@ import (
 )
 
 type hostData struct {
-	ContainerId string `json:"containerId"`
+	ContainerID string `json:"containerId"`
 	Name        string `json:"name"`
-	Ip          string `json:"ip"`
+	IP          string `json:"ip"`
 }
 
 type loggerData struct {
-	RequestId     string   `json:"requestId"`
-	TransactionId string   `json:"transactionId"`
-	SessionId     string   `json:"sessionId"`
-	ProductId     string   `json:"productId"`
-	ChannelId     string   `json:"channelId"`
+	RequestID     string   `json:"requestId"`
+	TransactionID string   `json:"transactionId"`
+	SessionID     string   `json:"sessionId"`
+	ProductID     string   `json:"productId"`
+	ChannelID     string   `json:"channelId"`
 	ConsumerName  string   `json:"consumerName"`
 	Environment   string   `json:"environment"`
 	Commerce      string   `json:"commerce"`
 	Host          hostData `json:"host"`
 }
 
+// TraceData defines the input trace data
 type TraceData struct {
-	TransactionId string
-	SessionId     string
-	ChannelId     string
+	TransactionID string
+	SessionID     string
+	ChannelID     string
 	ConsumerName  string
 }
 
+// Logger defines the logger common interface
 type Logger interface {
 	Info(msg string, payload ...map[string]interface{})
 	Debug(msg string, payload ...map[string]interface{})
@@ -46,29 +48,41 @@ type Logger interface {
 	Error(err error)
 }
 
-type ZapLogger struct {
-	data       loggerData
-	logHandler *zap.Logger
+type zapI interface {
+	Info(msg string, fields ...zap.Field)
+	Debug(msg string, fields ...zap.Field)
+	Warn(msg string, fields ...zap.Field)
+	Error(msg string, fields ...zap.Field)
+	Sync() error
 }
 
-func (z *ZapLogger) Info(msg string, payload ...map[string]interface{}) {
+// ZapLogger defines a zap logger common instance
+type ZapLogger struct {
+	data       loggerData
+	logHandler zapI
+}
 
+var getLoggerConfig = configs.GetLoggerConfig
+
+// Info logs an info message
+func (z *ZapLogger) Info(msg string, payload ...map[string]interface{}) {
 	z.logHandler.Info(msg, zap.Any("payload", checkPayload(payload)))
 	z.logHandler.Sync()
 }
 
+// Debug logs a debug message
 func (z *ZapLogger) Debug(msg string, payload ...map[string]interface{}) {
-
 	z.logHandler.Debug(msg, zap.Any("payload", checkPayload(payload)))
 	z.logHandler.Sync()
 }
 
+// Warn logs a warn message
 func (z *ZapLogger) Warn(msg string, payload ...map[string]interface{}) {
-
 	z.logHandler.Warn(msg, zap.Any("payload", checkPayload(payload)))
 	z.logHandler.Sync()
 }
 
+// Error logs an error message
 func (z *ZapLogger) Error(err error) {
 	logPayload := zap.Any("payload", map[string]interface{}{})
 	errMsg := err.Error()
@@ -140,8 +154,11 @@ func newZapLogger(ld loggerData, loggerConfig configs.LoggerConfig) (*zap.Logger
 	return zapConfig.Build()
 }
 
+var zapRegisterSink = zap.RegisterSink
+
+// SetupFileStore sets the directory where logs will be stored
 func SetupFileStore() error {
-	logConfig := configs.GetLoggerConfig()
+	logConfig := getLoggerConfig()
 
 	lumbLogger := lumberjack.Logger{
 		Filename:   logConfig.Filepath,
@@ -151,32 +168,35 @@ func SetupFileStore() error {
 		Compress:   true,
 	}
 
-	return zap.RegisterSink("lumberjack", func(*url.URL) (zap.Sink, error) {
+	return zapRegisterSink("lumberjack", func(*url.URL) (zap.Sink, error) {
 		return lumberjackSink{
 			Logger: &lumbLogger,
 		}, nil
 	})
 }
 
+var _newZapLogger = newZapLogger
+
+// NewLogger creates a new logger instance
 func NewLogger(traceData TraceData) (Logger, error) {
-	loggerConfig := configs.GetLoggerConfig()
+	loggerConfig := getLoggerConfig()
 	ld := loggerData{
-		RequestId:     uuid.NewString(),
-		TransactionId: traceData.TransactionId,
-		SessionId:     traceData.SessionId,
-		ProductId:     loggerConfig.ProductId,
-		ChannelId:     traceData.ChannelId,
+		RequestID:     uuid.NewString(),
+		TransactionID: traceData.TransactionID,
+		SessionID:     traceData.SessionID,
+		ProductID:     loggerConfig.ProductID,
+		ChannelID:     traceData.ChannelID,
 		ConsumerName:  traceData.ConsumerName,
 		Environment:   loggerConfig.Env,
 		Commerce:      loggerConfig.Commerce,
 		Host: hostData{
-			ContainerId: loggerConfig.ContainerId,
+			ContainerID: loggerConfig.ContainerID,
 			Name:        loggerConfig.HostName,
-			Ip:          loggerConfig.HostIp,
+			IP:          loggerConfig.HostIP,
 		},
 	}
 
-	zapLogger, err := newZapLogger(ld, loggerConfig)
+	zapLogger, err := _newZapLogger(ld, loggerConfig)
 
 	return &ZapLogger{
 		data:       ld,

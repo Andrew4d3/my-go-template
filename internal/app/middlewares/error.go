@@ -30,11 +30,13 @@ func logError(c echo.Context, err error) {
 	}
 }
 
+var _logError = logError
+
 func errorMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		err := next(c)
 		if err != nil {
-			logError(c, err)
+			_logError(c, err)
 			err = transformError(err)
 		}
 

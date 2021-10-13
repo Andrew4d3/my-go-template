@@ -7,18 +7,19 @@ import (
 	"os"
 )
 
+// AppConfig defines application config
 type AppConfig struct {
-	PORT           string
-	ENVIRONMENT    string
-	CONTAINER_ID   string
-	HOSTNAME       string
-	HOST_IP        string
-	PRODUCT_ID     string
-	COUNTRY        string
-	JWT_SECRET     string
-	SERVICE_NAME   string
-	MONGO_URI      string
-	MONGO_DATABASE string
+	Port          string
+	Environment   string
+	ContainerID   string
+	HostName      string
+	HostIP        string
+	ProductID     string
+	Country       string
+	JWTSecret     string
+	ServiceName   string
+	MongoURI      string
+	MongoDatabase string
 }
 
 var appConfig *AppConfig
@@ -33,14 +34,17 @@ func getConfigFromEnv(envName string, defaultValue string) string {
 	return envar
 }
 
-func getIp() (string, error) {
-	req, err := http.Get("http://ip-api.com/json/")
+var httpGet = http.Get
+var ioultilReadAll = ioutil.ReadAll
+
+func getIP() (string, error) {
+	res, err := httpGet("http://ip-api.com/json/")
 	if err != nil {
 		return "", err
 	}
-	defer req.Body.Close()
+	defer res.Body.Close()
 
-	body, err := ioutil.ReadAll(req.Body)
+	body, err := ioultilReadAll(res.Body)
 	if err != nil {
 		return "", err
 	}
@@ -51,33 +55,38 @@ func getIp() (string, error) {
 	return ip["query"], nil
 }
 
+var osHostname = os.Hostname
+var _getIP = getIP
+var osArgs = os.Args
+
+// GetAppConfig gets application config
 func GetAppConfig() AppConfig {
 	if appConfig == nil {
 		appConfig = &AppConfig{}
 
-		appConfig.ENVIRONMENT = getConfigFromEnv("ENVIRONMENT", "dev")
-		appConfig.PORT = getConfigFromEnv("PORT", "3000")
+		appConfig.Environment = getConfigFromEnv("ENVIRONMENT", "dev")
+		appConfig.Port = getConfigFromEnv("PORT", "3000")
 
 		var hostname = "no-hostname"
-		if name, err := os.Hostname(); err == nil {
+		if name, err := osHostname(); err == nil {
 			hostname = name
 		}
 
-		appConfig.CONTAINER_ID = getConfigFromEnv("CONTAINER_ID", hostname)
-		appConfig.HOSTNAME = getConfigFromEnv("HOSTNAME", hostname)
+		appConfig.ContainerID = getConfigFromEnv("CONTAINER_ID", hostname)
+		appConfig.HostName = getConfigFromEnv("HOSTNAME", hostname)
 
 		var iP = "127.0.0.1"
-		if _ip, err := getIp(); err == nil {
+		if _ip, err := _getIP(); err == nil {
 			iP = _ip
 		}
 
-		appConfig.HOST_IP = getConfigFromEnv("HOST_IP", iP)
-		appConfig.PRODUCT_ID = "SEGUROS_CL" // Change this to the corresponding product Id
-		appConfig.COUNTRY = "CL"
-		appConfig.JWT_SECRET = getConfigFromEnv("JWT_SECRET", "")
-		appConfig.SERVICE_NAME = os.Args[0]
-		appConfig.MONGO_URI = getConfigFromEnv("MONGO_URI", "")
-		appConfig.MONGO_DATABASE = getConfigFromEnv("MONGO_DATABASE", "")
+		appConfig.HostIP = getConfigFromEnv("HOST_IP", iP)
+		appConfig.ProductID = "SEGUROS_CL" // Change this to the corresponding product Id
+		appConfig.Country = "CL"
+		appConfig.JWTSecret = getConfigFromEnv("JWT_SECRET", "")
+		appConfig.ServiceName = osArgs[0]
+		appConfig.MongoURI = getConfigFromEnv("MONGO_URI", "")
+		appConfig.MongoDatabase = getConfigFromEnv("MONGO_DATABASE", "")
 	}
 
 	return *appConfig

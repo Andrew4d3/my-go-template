@@ -10,9 +10,10 @@ import (
 
 var getJWTSecret = configs.GetAppConfig
 
+// AuthorizationMiddleware is a middleware that verifies if JWT is valid. Otherwise it returns error
 func AuthorizationMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		jwtSecret := getJWTSecret().JWT_SECRET
+		jwtSecret := getJWTSecret().JWTSecret
 		authHeader := c.Request().Header.Get("authorization")
 
 		if authHeader == "" {
