@@ -27,4 +27,4 @@ docker-debug-build:
 	docker build -f docker/debug/Dockerfile -t $(PROJECT_NAME):debug .
 
 docker-debug-run:
-	docker run --rm -it $(volumes) -p 3000:3000 -p 4000:4000 --env-file ./.env $(PROJECT_NAME):debug
+	docker run --rm -it $(volumes) -p 3000:3000 -p 4000:4000 --security-opt=seccomp:unconfined --env-file ./.env $(PROJECT_NAME):debug

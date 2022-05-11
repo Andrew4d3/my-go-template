@@ -51,7 +51,8 @@ func main() {
 	mainLogger, err := logger.NewLogger(logger.TraceData{})
 	panicError(err)
 
-	connectToDB(mainLogger)
+	// Uncomment this line when you get your DB connection ready
+	// connectToDB(mainLogger)
 
 	echoServer := echo.New()
 	middlewares.SetMiddlewares(echoServer)

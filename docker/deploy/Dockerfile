@@ -1,9 +1,9 @@
-FROM hub.fif.tech/base/golang:1.16-latest
+FROM golang:1.16
 
 WORKDIR /app
 
-# Pending
-COPY server .
-COPY vault ./vault
+COPY . .
 
-ENTRYPOINT envconsul -config="vault/config.${ENVIRONMENT}.hcl" ./server
+RUN go build -v -o server ./cmd/server
+
+CMD ./server
