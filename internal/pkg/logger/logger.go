@@ -24,11 +24,9 @@ type loggerData struct {
 	RequestID     string   `json:"requestId"`
 	TransactionID string   `json:"transactionId"`
 	SessionID     string   `json:"sessionId"`
-	ProductID     string   `json:"productId"`
 	ChannelID     string   `json:"channelId"`
 	ConsumerName  string   `json:"consumerName"`
 	Environment   string   `json:"environment"`
-	Commerce      string   `json:"commerce"`
 	Host          hostData `json:"host"`
 }
 
@@ -184,11 +182,9 @@ func NewLogger(traceData TraceData) (Logger, error) {
 		RequestID:     uuid.NewString(),
 		TransactionID: traceData.TransactionID,
 		SessionID:     traceData.SessionID,
-		ProductID:     loggerConfig.ProductID,
 		ChannelID:     traceData.ChannelID,
 		ConsumerName:  traceData.ConsumerName,
 		Environment:   loggerConfig.Env,
-		Commerce:      loggerConfig.Commerce,
 		Host: hostData{
 			ContainerID: loggerConfig.ContainerID,
 			Name:        loggerConfig.HostName,

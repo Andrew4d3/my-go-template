@@ -140,8 +140,6 @@ func Test_GetAppConfig(t *testing.T) {
 			ContainerID:   "test-container",
 			HostName:      "test-host",
 			HostIP:        "10.1.2.3",
-			ProductID:     "SEGUROS_CL",
-			Country:       "CL",
 			JWTSecret:     "test-secret",
 			ServiceName:   "test-server",
 			MongoURI:      "mongo://test:2121",

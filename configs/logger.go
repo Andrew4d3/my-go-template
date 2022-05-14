@@ -20,8 +20,6 @@ type LoggerConfig struct {
 	Level       string
 	Filepath    string
 	ServiceName string
-	ProductID   string
-	Commerce    string
 	HostName    string
 	HostIP      string
 	ContainerID string
@@ -38,8 +36,6 @@ func GetLoggerConfig() LoggerConfig {
 	loggerConfig.Level = getConfigFromEnv("LOG_LEVEL", string(Info))
 	loggerConfig.Filepath = getConfigFromEnv("LOG_FILE_PATH", "./logs/logfile.log")
 	loggerConfig.ServiceName = appConfig.ServiceName
-	loggerConfig.ProductID = appConfig.ProductID
-	loggerConfig.Commerce = "SEGUROS"
 	loggerConfig.HostName = appConfig.HostName
 	loggerConfig.HostIP = appConfig.HostIP
 	loggerConfig.ContainerID = appConfig.ContainerID

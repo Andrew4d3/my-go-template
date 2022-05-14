@@ -14,8 +14,6 @@ type AppConfig struct {
 	ContainerID   string
 	HostName      string
 	HostIP        string
-	ProductID     string
-	Country       string
 	JWTSecret     string
 	ServiceName   string
 	MongoURI      string
@@ -81,8 +79,6 @@ func GetAppConfig() AppConfig {
 		}
 
 		appConfig.HostIP = getConfigFromEnv("HOST_IP", iP)
-		appConfig.ProductID = "SEGUROS_CL" // Change this to the corresponding product Id
-		appConfig.Country = "CL"
 		appConfig.JWTSecret = getConfigFromEnv("JWT_SECRET", "")
 		appConfig.ServiceName = osArgs[0]
 		appConfig.MongoURI = getConfigFromEnv("MONGO_URI", "")

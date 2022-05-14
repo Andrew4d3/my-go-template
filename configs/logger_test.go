@@ -17,7 +17,6 @@ func Test_GetLoggerConfig(t *testing.T) {
 			return AppConfig{
 				Environment: "test",
 				ServiceName: "test-service",
-				ProductID:   "test-product",
 				HostName:    "test-host",
 				HostIP:      "1.2.3.4",
 				ContainerID: "12345",
@@ -29,8 +28,6 @@ func Test_GetLoggerConfig(t *testing.T) {
 			Level:       "info",
 			Filepath:    "./logs/logfile.log",
 			ServiceName: "test-service",
-			ProductID:   "test-product",
-			Commerce:    "SEGUROS",
 			HostName:    "test-host",
 			HostIP:      "1.2.3.4",
 			ContainerID: "12345",

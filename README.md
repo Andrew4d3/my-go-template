@@ -1,80 +1,227 @@
-# [PROJECT NAME]
-[Project Description]
+# My Go Template for building REST APIs
 
-### Instrucciones para usar el Template (Borrar una vez completadas)
+[[Project Description here]]
 
-1. Clonar este repo y borrar el directorio .git
-2. Substituir todas las apariciones de "template-go-api" con el nombre real del proyecto. Pueden usar alguna herramienta CLI o VSCode para hacerlo.
-3. Iniciar un nuevo repo de GIT con: `git init`
-4. Asignar el remoto origin correspondiente de Gitlab
+## Template Description
 
-Una vez tengan los elementos necesarios para deployar listos (stack deploy, cluster, vault, etc) es necesario modificar los siguientes archivos:
+> Delete this section after initializing your project
 
-1. Modificar los archivos de vault en las rutas `vault/config.prod.hcl` y `vault/config.qa.hcl`
-2. Modificar el pipeline de Gitlab. En especial el ultimo paso donde se actualiza el stack deploy.
+### **How to use this template?**
+
+Clone this repo and then delete the `.git` folder so that you can start a new git repository using: `git init`. Alternatively, you can use the "Project from template" Github feature.
+
+### **Stack**
+
+-  Echo as web server (with complements)
+-  Zap as logger library
+-  Testify as testing library
+-  JWT Integration through middleware
+
+### **Logger**
+
+This template includes a logger integration that you can use through the Echo context:
+
+```go
+import (
+	"template-go-api/internal/app/middlewares"
+)
+
+// ...
+
+func Controller(c echo.Context) error {
+	cc:= c.(middlewares.CustomContext)
+	logger := cc.CustomLogger()
+	logger.Info("Hello")
+}
+```
+
+Which will print the following log entry:
+
+```
+{"level":"info","date":"2022-05-12T08:37:25.716-0400","message":"Hello","channelId":"","consumerName":"","environment":"dev","host":{"containerId":"andrew-XPS-15-9560","ip":"186.00.00.00","name":"andrew-XPS-15-9560"},"requestId":"8368b925-0e3a-4964-81ef-6f2b7788f160","sessionId":"","transactionId":"","payload":{}}
+```
+
+Additionaly, If you're working with microservices, you can propagate correlation IDs in your log entries by using the following headers:
+
+-  `x-transaction-id`: To identify an end-to-end call chain.
+-  `x-session-id`: To identify multiple related call chains.
+-  `x-channel-id`: To identify the channel that was used to start the call chain. (web, mobile app, etc).
+-  `x-consumer`: To identify the caller service.
+
+### **Custom Errors**
+
+Optionally, you can use the CustomError package found at `internal/pkg/customerror`, if you want to provide more detailed errors in your logs:
+
+```go
+customError := customerror.New("Boom", customerror.InputData{
+	Data: map[string]interface{}{ // Any interface here
+		"foo": "bar",
+	},
+})
+```
+
+### **Authorization**
+
+You can use the authorization middleware for controling access to your protected routes. Example:
+
+```go
+import (
+	"template-go-api/internal/app/middlewares"
+)
 
 
-## Requerimientos
-- Go 1.16 (recomendado usar gvm o Docker)
-- Make
-- Docker
+e.GET("/protected", controllers.HealthCheck, middlewares.AuthorizationMiddleware)
+```
 
-## Instrucciones para correr proyecto de forma local (host)
+If a valid JWT is not provided as Bearer token in the authorization header, an HTTP 401 response like this will be returned:
 
-1. Primero es necesario preparar el archivo `.env` en la raiz del proyecto. El cual tiene el siguiente formato:
+```json
+{
+   "message": "Authorization header is not present"
+}
+```
+
+## Requirements
+
+-  Go 1.16 (\*)
+-  Make
+-  Docker (If you want to use Docker for development)
+
+(\*) For managing multiple Go versions, I recommend using [Go Version Manager](https://github.com/moovweb/gvm) (gvm)
+
+## Instructions for running via Host
+
+1. Create a `.env` file at the project's root:
 
 ```env
 ENVIRONMENT=dev
 PORT=3000
 JWT_SECRET=<YOUR_SECRET_HERE>
+# If you are using mongo, otherwise locate your DB secrets here
 MONGO_URI=<YOUR_MONGO_URI>
 MONGO_DATABASE=<YOUR_MONGO_DATABASE>
 ```
-2. Luego haciendo uso de Make. Correr el siguiente comando:
+
+**Note**: In production you should inject your env variables directly into the procces
+
+2. To start the dev server, run the make command:
+
 ```sh
 make host-run
 ```
-3. El proyecto deberia iniciar en el puerto 3000 o cualquier otro indicado por variables de entorno locales o en el archivo `.env`
 
-## Instrucciones para correr proyecto usando Docker
+3. Now, the project should start at port 3000 or any other port indicated by the env variables.
 
-1. Tambien es necesario contar con un archivo `.env` listo en la raiz del proyecto
-2. Primero es necesario construir la imagen docker usando el siguiente comando make:
+## Instructions for running via Docker
+
+1. Create the same env file described in the first step of the previous section.
+
+2. Run the docker image using the make command:
+
 ```sh
 make docker-dev-build
 ```
-3. Una vez construida la imagen, se puede ejecutar usando el siguiente comando:
+
+3. If the image was built successfully, run the following make command to start a container using the corresponding image:
+
 ```sh
 make docker-dev-run
 ```
-4.  El proyecto deberia iniciar en el puerto 3000 o cualquier otro indicado en el archivo `.env`
 
-## Correr pruebas unitarias y de lintaje
+4. Now, the project should start at port 3000 or any other port indicated by the env variables.`
 
-Simplemente correr: 
+## Unit tests and Linter
+
+For unit tests, just run:
+
 ```sh
 make test
 ```
-Para el linter:
+
+For linter, run:
+
 ```sh
 make lint
 ```
 
-## Debug server usando Docker
+## Debugging using the VSCode editor
 
-Es posible iniciar un debug server con docker. Primero hay que construir la imagen correspondiente:
+If you're using VSCode as main editor, you can leverage to use its poweful debugger. The only thing you need to do is to locate the following `launch.json` file into the `.vscode` folder at the project's root.
+
+```json
+{
+   // Use IntelliSense to learn about possible attributes.
+   // Hover to view descriptions of existing attributes.
+   // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+   "version": "0.2.0",
+   "configurations": [
+      {
+         "name": "Launch Package",
+         "type": "go",
+         "request": "launch",
+         "mode": "auto",
+         "program": "cmd/server"
+      }
+   ]
+}
+```
+
+The configurations above will tell VSCode to start a debugger from the main go file.
+
+## Debugging using Docker
+
+It's also possible to start a Debug server using docker. First run the following make command to build the corresponding Docker image:
 
 ```sh
 make docker-debug-build
 ```
-Luego iniciarla:
+
+Now to start the debugg server, just run:
+
 ```sh
 make docker-debug-run
 ```
-Un servidor en modo debugger iniciara en el puerto 4000. Al cual pueden enlazar cualquier cliente de Debugger compatible con delv que posean. El de VSCode es bastante bueno.
 
-## A la hora de deployar
+A debug server should start through port 4000. You can connect to this server using any Debugger client. If you're using VSCode as Debugger client, you can use the following configuration in your `.vscode/launch.json` file:
 
-Ya el proyecto cuenta con todos los pasos de Gitlab CICD configurados. En el momento de subir cualquier cambio al repo en una rama diferente a Master, se correran las verificaciones iniciales (Linter, Pruebas, Detector de secretos y vulnerabilidades). Una vez el pipeline finalice, el merge request (MR) puede ser mergeado con master. Una vez hecho esto, el resto de los pasos empezara a correr (compilacion, construccion de la imagen, etc)
+```json
+{
+   // Use IntelliSense to learn about possible attributes.
+   // Hover to view descriptions of existing attributes.
+   // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+   "version": "0.2.0",
+   "configurations": [
+      {
+         "name": "Connect to server",
+         "type": "go",
+         "request": "attach",
+         "mode": "remote",
+         "remotePath": "/app",
+         "port": 4000,
+         "host": "127.0.0.1"
+      }
+   ]
+}
+```
 
-No es posible subir cambios directamente a Master. Todo debe ser hecho a traves de un MR.
+## For Production
+
+This template comes with a minimal Dockerfile located at `docker/deploy/Dockerfile` that you can use to deploy your application into production or any other environment you migh have. Feel free to extend it to include any other additional software you migh need to correctly run your Go application.
+
+If you want to build the binary file using a CI/CD tool, you should use the following command:
+
+```sh
+go build -v -o server ./cmd/server
+```
+
+Additionaly, you should include in your pipeline the corresponding commands for testing:
+
+```sh
+go test -v ./...
+```
+
+And linting:
+
+```sh
+golint -set_exit_status  ./...
+```
