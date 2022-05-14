@@ -48,7 +48,7 @@ func getIP() (string, error) {
 	}
 
 	var ip map[string]string
-	json.Unmarshal(body, &ip)
+	_ = json.Unmarshal(body, &ip)
 
 	return ip["query"], nil
 }

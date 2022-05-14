@@ -10,10 +10,6 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-var foo interface{}
-
-func bar() {}
-
 func Test_SetMiddlewares(t *testing.T) {
 	mockedMiddlewareServer := new(mocks.Middleware)
 	mockedMiddlewareServer.On("Use", mock.Anything)

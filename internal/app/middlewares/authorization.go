@@ -4,7 +4,7 @@ import (
 	"strings"
 	"template-go-api/configs"
 
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
 )
 

@@ -12,7 +12,7 @@ test:
 	go test -v ./...
 
 lint:
-	golint -set_exit_status  ./...
+	golangci-lint run
 
 docker-dev-build:
 	docker build -f docker/dev/Dockerfile -t $(PROJECT_NAME):dev .

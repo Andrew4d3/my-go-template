@@ -2,26 +2,15 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"template-go-api/configs"
 	"template-go-api/internal/app/middlewares"
 	"template-go-api/internal/app/routes"
 	"template-go-api/internal/pkg/customerror"
-	"template-go-api/internal/pkg/drivers/mongodb"
 	"template-go-api/internal/pkg/logger"
 
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 )
-
-func getPort() string {
-	var PORT string
-	if PORT = os.Getenv("PORT"); PORT == "" {
-		PORT = "3000"
-	}
-
-	return PORT
-}
 
 func panicError(err error) {
 	if err != nil {
@@ -30,22 +19,23 @@ func panicError(err error) {
 	}
 }
 
-func connectToDB(mainLogger logger.Logger) {
-	mainLogger.Info("Connecting to Mongo DB")
-	appConfigs := configs.GetAppConfig()
+// func connectToDB(mainLogger logger.Logger) {
+// 	mainLogger.Info("Connecting to Mongo DB")
+// 	appConfigs := configs.GetAppConfig()
 
-	if err := mongodb.ConnectDB(appConfigs.MongoURI, appConfigs.MongoDatabase); err != nil {
-		mainLogger.Error(customerror.NewFromErrror(err))
-		// Panic here if you are required to have a DB connection for running your app
-		return
-	}
-	mainLogger.Info("Mongo connection established")
-}
+// 	if err := mongodb.ConnectDB(appConfigs.MongoURI, appConfigs.MongoDatabase); err != nil {
+// 		mainLogger.Error(customerror.NewFromErrror(err))
+// 		// Panic here if you are required to have a DB connection for running your app
+// 		return
+// 	}
+// 	mainLogger.Info("Mongo connection established")
+// }
 
 func main() {
-	godotenv.Load()
+	err := godotenv.Load()
+	panicError(err)
 
-	err := logger.SetupFileStore()
+	err = logger.SetupFileStore()
 	panicError(err)
 
 	mainLogger, err := logger.NewLogger(logger.TraceData{})

@@ -1,0 +1,35 @@
+name: my-go-template
+on: [push]
+jobs:
+  preload-go-dep:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/go-cache
+      - run: go mod download
+  lint:
+    runs-on: ubuntu-latest
+    needs: [preload-go-dep]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          go-version-file: 'go.mod'
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3
+  test:
+    runs-on: ubuntu-latest
+    needs: [preload-go-dep]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/go-cache
+      - run: go test -v ./...
+
+  security:
+    runs-on: ubuntu-latest
+    needs: [preload-go-dep]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/go-cache
+      - run: go list -json -deps ./... > go.list
+      - uses: sonatype-nexus-community/nancy-github-action@main
