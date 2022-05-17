@@ -8,7 +8,7 @@
 
 ### **How to use this template?**
 
-Clone this repo and then delete the `.git` folder so that you can start a new git repository using: `git init`. Alternatively, you can use the "Project from template" Github feature.
+Clone this repo and then delete the `.git` folder so that you can start a new git repository using: `git init`. Alternatively, you can use the "Use this template" feature from Github.
 
 ### **Stack**
 
@@ -86,6 +86,7 @@ If a valid JWT is not provided as Bearer token in the authorization header, an H
 -  Go 1.16 (\*)
 -  Make
 -  Docker (If you want to use Docker for development)
+-  [golangci-lint](https://github.com/golangci/golangci-lint) for linter
 
 (\*) For managing multiple Go versions, I recommend using [Go Version Manager](https://github.com/moovweb/gvm) (gvm)
 
@@ -138,11 +139,13 @@ For unit tests, just run:
 make test
 ```
 
-For linter, run:
+For linter(\*), run:
 
 ```sh
 make lint
 ```
+
+(\*) Remember to have golangci-lint installed
 
 ## Debugging using the VSCode editor
 

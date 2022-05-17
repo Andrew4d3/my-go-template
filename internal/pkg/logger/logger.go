@@ -65,19 +65,19 @@ var getLoggerConfig = configs.GetLoggerConfig
 // Info logs an info message
 func (z *ZapLogger) Info(msg string, payload ...map[string]interface{}) {
 	z.logHandler.Info(msg, zap.Any("payload", checkPayload(payload)))
-	z.logHandler.Sync()
+	_ = z.logHandler.Sync()
 }
 
 // Debug logs a debug message
 func (z *ZapLogger) Debug(msg string, payload ...map[string]interface{}) {
 	z.logHandler.Debug(msg, zap.Any("payload", checkPayload(payload)))
-	z.logHandler.Sync()
+	_ = z.logHandler.Sync()
 }
 
 // Warn logs a warn message
 func (z *ZapLogger) Warn(msg string, payload ...map[string]interface{}) {
 	z.logHandler.Warn(msg, zap.Any("payload", checkPayload(payload)))
-	z.logHandler.Sync()
+	_ = z.logHandler.Sync()
 }
 
 // Error logs an error message
@@ -97,7 +97,7 @@ func (z *ZapLogger) Error(err error) {
 	}
 
 	z.logHandler.Error(errMsg, logPayload)
-	z.logHandler.Sync()
+	_ = z.logHandler.Sync()
 }
 
 type lumberjackSink struct {
@@ -132,7 +132,7 @@ func newZapLogger(ld loggerData, loggerConfig configs.LoggerConfig) (*zap.Logger
 	var initialFields map[string]interface{}
 	jsonInitialFields, _ := json.Marshal(&ld)
 
-	json.Unmarshal(jsonInitialFields, &initialFields)
+	_ = json.Unmarshal(jsonInitialFields, &initialFields)
 
 	zapConfig := zap.Config{
 		Level:       zap.NewAtomicLevelAt(getZapLevel(loggerConfig.Level)),

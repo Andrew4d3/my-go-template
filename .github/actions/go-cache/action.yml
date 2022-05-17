@@ -1,0 +1,15 @@
+name: 'go-cache'
+description: 'Set up go and cache'
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/setup-go@v3
+      with:
+        go-version-file: 'go.mod'
+    - uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cache/go-build
+          ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: ${{ runner.os }}-go-
